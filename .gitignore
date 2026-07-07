@@ -1,0 +1,35 @@
+# --- Local working notes (not part of this repo) ----------------------------
+docs/private/
+docs/private
+
+# --- Claude Code ------------------------------------------------------------
+# settings.json is committed (it carries the team commit/attribution policy).
+# Local, machine-specific overrides are not.
+.claude/settings.local.json
+
+# --- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Models / data / captures (large; keep out of git) ----------------------
+*.pt
+*.onnx
+*.tflite
+*.rpk
+/data/
+/captures/
+/models/
+
+# --- OS / editor ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

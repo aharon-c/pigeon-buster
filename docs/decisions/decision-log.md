@@ -5,6 +5,7 @@ context live in the private session log entry for that date.
 
 | Date | Decision | Rationale | Status |
 |---|---|---|---|
+| 2026-07-10 | Confirmed Pi 5 **8 GB** over 4 GB (₪800 vs ₪500; 4 GB out of stock at the approved reseller) | Perception alone fits 4 GB (inference is on-sensor), but 8 GB buys orchestrator/telemetry/dev-on-device headroom and keeps the Hailo-HAT/VLM upgrade path open; ₪300 is cheap insurance against re-buying the board | Adopted |
 | 2026-07-09 | Targeting is species-agnostic: any bird entering the protected zone triggers deterrence; no ignore list | Matches how the site is actually used by birds; simplifies perception to a generic "bird" class, which fits Path A's fixed-class on-sensor models | Adopted |
 | 2026-07-09 | Quiet hours (nightly + a weekend window): deterrent sound suppressed, water-only deterrence continues | Respect neighbours and rest windows while keeping the zone defended when birds are active | Adopted |
 | 2026-07-09 | Replace the existing solar siren with a Pi-driven speaker (no gating investigation) | Full software control of when/what sound plays (incl. quiet hours); gating an unlabeled siren adds unknowns for little saving | Adopted |

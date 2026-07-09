@@ -1,18 +1,18 @@
 # SDD — Pigeon Buster
 ### Software / System Design Document · built with Spec-Driven Development
 
-Status: **living document (v0.2, concrete draft)** · Owner: project author · Last updated: 2026-06-16
+Status: **living document (v0.3, session-1 intake folded in)** · Owner: project author · Last updated: 2026-07-09
 
 > **What "SDD" means here.** Two senses, both used: (1) **this document** — the
 > Software/System Design Document (the *what* and *why*, the contract we build against); and
 > (2) the **method** — Spec-Driven Development: agree the spec before code, then per feature go
 > spec → plan → tests → implementation → docs (workflow rules live in `CLAUDE.md`).
 >
-> **How to read v0.2.** Assumptions have been turned into **concrete numbers** so the document
-> is buildable. Every value that still needs your confirmation or a real-world measurement is
-> tagged **`[A]`** (assumption) and listed in the **Assumptions Register (§12)**. Defaults are
-> sensible starting points for a **Giv'at Shmuel (central Israel) rooftop**; change any that
-> are wrong. Numbers marked **"measure"** must be validated on real hardware before trusted.
+> **How to read v0.3.** v0.2 turned assumptions into **concrete numbers**; v0.3 folds in the
+> answered session-1 intake, so most site and policy values are now **confirmed** for a
+> **central-Israel rooftop terrace**. Values still tagged **`[A]`** (listed in the
+> **Assumptions Register, §12**) are chiefly bench-measurement or tuning items. Numbers marked
+> **"measure"** must be validated on real hardware before trusted.
 
 ---
 
@@ -37,21 +37,28 @@ Not a people-surveillance product; not lethal/harmful in any mode; not cloud-dep
 ## 2. Humane & legal guardrails (hard requirements)
 - **Deterrence only.** Water = gentle, low-pressure stream that startles but cannot hurt; from
   the operating distance it should feel like a light spray on a human hand, never a sting.
-  Verify empirically; nozzle adjustable; pressure capped.
-- **Target only nuisance species** (pigeon/feral dove); configurable to **ignore** protected or
-  desirable species.
+  Verify empirically; nozzle adjustable. The pressure/range cap is **configurable within the
+  humane ceiling** (it may be raised over time if deterrence results disappoint), and **all
+  spray must stay inside the protected terrace — no overspray past the railing**.
+- **Species-agnostic targeting (decided 2026-07):** **any bird** entering the protected zone
+  is deterred; no ignore list. Humane-deterrence-only therefore applies equally to every
+  species; per-class configuration (FR-8) remains available if targeting ever needs to narrow.
 - **Operator responsibility:** verify local protected-species / nuisance / water-use rules
-  before deployment. Hardware **master switch** + software **panic-disable** required.
+  before deployment — **open `[TODO]`**, and species-agnostic targeting makes this check
+  stricter. Hardware **master switch** + software **panic-disable** required.
 - **Privacy:** camera frames the protected zone (roof/sky), **not** neighbours; no images leave
   the device except optional, user-initiated alerts.
 
-## 3. Site & environment (concrete) `[A]`
-- **Mounting:** flat house roof; camera covers a defined protected zone plus the approach. `[A]`
-- **Protected zone:** ≈ **16 m² (≈ 4 m × 4 m)**; birds engaged at **2–6 m** range. Drives lens
-  choice, water range, and aim accuracy. `[A — confirm]`
-- **Climate (central Israel):** ambient **≈ −2 °C to +42 °C**; a sealed sunlit enclosure can
-  exceed **60 °C** inside. Rain mainly **Oct–Apr**. **Peak-sun-hours ≈ 6/day** average (winter
-  ≈ 3.5, summer ≈ 7.5). `[A]`
+## 3. Site & environment (confirmed 2026-07)
+- **Mounting:** a flat rooftop terrace enclosed by a railing, beside a pitched roof. The
+  camera sits at one railing end and looks back along the terrace toward the main perch
+  structures (an AC outdoor unit, a storage shed, and the adjacent pitched roof).
+- **Protected zone:** the terrace (**3.5 m × 6.3 m**) plus ~1 m beyond each edge to intercept
+  birds before they land ≈ a **5.5 × 8.3 m envelope (~46 m²)**; engagement range from the
+  camera **2–6.5 m**. Drives lens choice, water range, and aim accuracy.
+- **Climate (central Israel, confirmed):** ambient **≈ −2 °C to +42 °C**; a sealed sunlit
+  enclosure can exceed **60 °C** inside. Rain mainly **Oct–Apr**. **Peak-sun-hours ≈ 6/day**
+  average (winter ≈ 3.5, summer ≈ 7.5).
 - **Thermal flag:** the AI Camera (IMX500) is rated **0–50 °C** — see §5/§8 (shade, ventilation,
   thermal pause). `[A]`
 
@@ -71,11 +78,15 @@ Not a people-surveillance product; not lethal/harmful in any mode; not cloud-dep
 - **FR-6 Self-protection:** detect the unit being struck/approached and raise an alert;
   (Phase 5) email. Trigger = **IMU jolt > ~1.5 g**, OR a target bbox **> ~35 % of frame** near
   centre for **> 1 s**, OR sudden camera occlusion. `[A — tune]`
-- **FR-7 Siren control:** first try to **gate the existing solar siren** (GPIO + relay/
-  transistor on its trigger) so it sounds **only on detection**; fall back to our own speaker.
+- **FR-7 Deterrent sound:** a **Pi-driven amplified speaker**, sounding **only on detection**
+  and honouring quiet hours (FR-10). The pre-existing solar siren is retired, not gated —
+  full software control of when/what plays outweighs reusing it.
 - **FR-8 Config & disable:** all thresholds/timings in a config file; **master enable/disable**
   + **dry-run mode** (detect + log, never fire).
 - **FR-9 Telemetry:** structured logs of detections/actions; a local status endpoint/LED.
+- **FR-10 Quiet hours:** suppress all deterrent **sound** from **sunset until 08:00** daily,
+  and from **Friday 15:30 until Sunday 08:00**; detection and **water** deterrence continue
+  (water-only mode). Windows and mode in config. `[A — tune]`
 
 ## 5. Non-functional requirements
 - **Resilience:** **IP65** enclosure, sun shade, passive ventilation/heat-sinking, UV-stable
@@ -100,8 +111,9 @@ Module boundaries: `perception/`, `aiming/`, `actuators/`, `power/`, `orchestrat
 `telemetry/`, `config/`, plus `sim/` for hardware-free testing.
 
 ## 7. AI / perception spec (concrete)
-- **Task:** real-time detection of **pigeon/dove** (target class); optional later classes
-  (cat, squirrel, crow). Output box + class + confidence.
+- **Task:** real-time detection of **any bird** (species-agnostic — the generic COCO **"bird"**
+  class); optional later classes (cat, squirrel). Output box + class + confidence. This
+  simplifies Path A: fixed-class on-sensor models ship with "bird" out of the box.
 - **Start model:** a **fixed-class detector** (YOLO-nano / MobileNet-SSD) compiled for the
   **IMX500** (Path A). Evaluate **YOLO-World** (open-vocabulary) only if/when we move to Path B
   and want configurable multi-species targeting. `[A]`
@@ -110,7 +122,7 @@ Module boundaries: `perception/`, `aiming/`, `actuators/`, `power/`, `orchestrat
 - **Calibration:** documented procedure mapping image coords → pan/tilt angles at the assumed
   target plane (the roof approach), with stated assumptions (distance/plane).
 - **Aiming targets (concrete):** **pan ±90°, tilt 0–60°** (servo + end-stops); centre the
-  target within **±3°** (enough to wet at 3–6 m). `[A]`
+  target within **±3°** (enough to wet at up to ~6.5 m). `[A]`
 - **Evaluation:** keep a small labelled clip set; report precision/recall + FPS. **Never
   fabricate metrics — measure them.**
 
@@ -144,28 +156,33 @@ Module boundaries: `perception/`, `aiming/`, `actuators/`, `power/`, `orchestrat
 - **Phase 5 — Monitoring & alerts:** water level + beeps, self-protection, email alerts.
 - **Phase 6 — Field hardening:** tuning, reliability, redeploy/handover docs.
 
+Phases are deliberately cut **small**, each ending in a demonstrable, committed milestone —
+available hours vary week to week, and the repo should always show working progress.
+
 ## 11. Network & budget
-- **Network:** assume **marginal rooftop Wi-Fi**; email alerts are **optional (Phase 5)** with
-  store-and-forward. `[A]`
-- **Budget:** **NOT SET — needs your input.** It affects Path A-vs-B and solar margins.
-  Indicative **Phase-1 (perception only)** cost ≈ **₪1,250–1,450** (Pi 5 8 GB + AI Camera +
-  cooler + PSU + microSD; see `docs/research/procurement-israel-china-global.md`). `[A — set ceiling]`
+- **Network:** **good terrace Wi-Fi** (confirmed) — helps development (SSH to the Pi) and the
+  optional Phase-5 alerts. Core deterrence must still work **fully offline**.
+- **Budget (decided 2026-07):** **Phase-1 ≈ ₪1,300** (Pi 5 8 GB + AI Camera + cooler + PSU +
+  microSD, bought locally; see `docs/research/procurement-israel-china-global.md`). The
+  **total ceiling is deliberately deferred** until Phase-1 bench measurements size the
+  solar/turret spend. `[A — total ceiling pending]`
 
 ## 12. Assumptions Register (resolve these)
 | # | Assumption (current concrete value) | How we confirm |
 |---|---|---|
-| A1 | Protected zone ≈ 4×4 m; engage range 2–6 m | You confirm the geometry/measurements |
-| A2 | Climate −2…+42 °C; PSH ≈ 6; interior may exceed 60 °C | Local data / a cheap logger on the roof |
-| A3 | Targets = pigeon + dove; ignore others | You confirm |
+| A1 | **Resolved 2026-07:** zone ≈ 5.5 × 8.3 m envelope (terrace 3.5 × 6.3 m + 1 m margin); engagement 2–6.5 m | Measured on site |
+| A2 | Climate −2…+42 °C; PSH ≈ 6; interior may exceed 60 °C | **Confirmed 2026-07** as defaults; validate with a cheap roof logger |
+| A3 | **Resolved 2026-07:** species-agnostic — any bird triggers; no ignore list | Decided |
 | A4 | Escalation: sound ≤2 s → if persists ≥3 s → 0.6 s water; ≤6 bursts/min | Tune on the bench |
 | A5 | Confirm logic 3-of-5 @ conf ≥0.50 | Tune against the labelled clip set |
 | A6 | Aim: pan ±90°, tilt 0–60°, accuracy ±3° | Validate after calibration |
 | A7 | Reservoir 5 L; burst ~0.6 s ≈ 25–40 mL; low-water ≤15 % | Measure on the bench |
 | A8 | Power: ~9 W active / ~3 W idle; 180 Wh/day; 100 W panel; 50 Ah LiFePO4 | **Measure** real draw in Phase 1, then resize |
-| A9 | Gate existing siren via GPIO/relay; else own speaker | Inspect the siren's trigger |
-| A10 | Architecture: monolith on the Pi to start | Revisit if real-time/power needs it |
-| A11 | Marginal Wi-Fi; alerts optional | Test on the roof |
-| A12 | Budget ceiling | **You set it** |
+| A9 | **Resolved 2026-07:** existing siren replaced by our own Pi-driven speaker | Decided |
+| A10 | Architecture: monolith on the Pi to start; split-ready hardware (PCA9685 behind a clean interface) | Revisit if real-time/power needs it |
+| A11 | **Confirmed 2026-07:** good terrace Wi-Fi; alerts optional; core works offline | Re-test at install |
+| A12 | Budget: **phase-1 ≈ ₪1,300 set**; total ceiling deferred | Set after Phase-1 measurements |
+| A13 | Quiet hours: sound off sunset→08:00 daily + Fri 15:30→Sun 08:00; water-only in those windows | Tune windows in config after field experience |
 
 > Many of these map to the questionnaire in `docs/private/session-1-intake.md`. Answer those to
 > close the register; record each resolution in the session log + `docs/decisions/decision-log.md`.

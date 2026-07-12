@@ -59,7 +59,7 @@ Israel, from China, or globally.
 | (Path B upgrade, optional) | **Raspberry Pi AI HAT+ (Hailo-8L, 13 TOPS)** + **Camera Module 3** | Only if you later want open-vocabulary (YOLO-World) or higher FPS. Reuses the same Pi. | Piitel / Plonter / Belshop (HAT not always in stock — ask) |
 | Active cooler | **Raspberry Pi Active Cooler** | The Pi 5 throttles under continuous inference without it; mandatory in a hot enclosure. | Piitel ≈ **₪30** |
 | Power supply (bench) | **Official 27 W USB-C PSU** | For development on the desk before solar. The deployed unit is powered from the solar rail instead. | Piitel ≈ **₪70** |
-| Storage | **NVMe SSD via M.2 HAT**, or a good A2 microSD to start | SSD is far more reliable for 24/7 outdoor logging than an SD card (SD cards wear out). Start on SD, move to NVMe for deployment. | SD: any IL shop; NVMe + M.2 HAT: Piitel/Plonter or AliExpress |
+| Storage | **NVMe SSD via M.2 HAT** for deployment; bench = **owned SanDisk High Endurance 256 GB** microSD (see phase-1 batch note) | SSD is far more reliable for 24/7 outdoor logging than an SD card (SD cards wear out). Start on the owned SD, move to NVMe for deployment. | NVMe + M.2 HAT: Piitel/Plonter or AliExpress |
 
 > ⚠️ **Thermal caveat:** the AI Camera's rated operating range is **0–50 °C**. An unshaded
 > roof box in an Israeli summer can exceed that. This is *why* the spec calls for a shaded,
@@ -122,7 +122,12 @@ servos, PCA9685, brackets, pump/solenoid, sensors, buck converter, panel, MPPT, 
 from AliExpress. Lowest cost, longer wait. Buy the **LiFePO4 battery locally** either way.
 
 **Suggested phase-1 batch (just enough to start perception, no actuators):** Pi 5 (8 GB),
-AI Camera, active cooler, 27 W PSU, microSD. Everything else waits until perception is
+AI Camera, active cooler, 27 W PSU — ≈ **₪1,300** at the local reseller (prices verified
+2026-07-10). **No microSD purchase:** the bench card is an already-owned **SanDisk High
+Endurance 256 GB**. Caveat: High Endurance cards are not A-rated, so random I/O may be
+slower than A1 — acceptable for the bench, and their continuous-write endurance is actually
+a bonus for detection logging. If on-Pi development feels sluggish, consider an A2 card
+then; deployment storage remains NVMe as planned. Everything else waits until perception is
 measured (FPS/accuracy/power) and the compute path (A vs B) is confirmed — don't buy the
 solar/turret/water parts until that decision is locked, to avoid buying the wrong size.
 

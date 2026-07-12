@@ -5,6 +5,7 @@ context live in the private session log entry for that date.
 
 | Date | Decision | Rationale | Status |
 |---|---|---|---|
+| 2026-07-12 | Bench storage = an already-owned SanDisk High Endurance 256 GB microSD; no card purchase — phase-1 batch ≈ ₪1,300 | Free and on hand; endurance-class cards suit continuous detection logging; not A-rated, so random I/O may lag A1 (acceptable on the bench — revisit A2 only if on-device dev feels sluggish); deployment stays NVMe | Adopted |
 | 2026-07-10 | Confirmed Pi 5 **8 GB** over 4 GB (₪800 vs ₪500; 4 GB out of stock at the approved reseller) | Perception alone fits 4 GB (inference is on-sensor), but 8 GB buys orchestrator/telemetry/dev-on-device headroom and keeps the Hailo-HAT/VLM upgrade path open; ₪300 is cheap insurance against re-buying the board | Adopted |
 | 2026-07-09 | Targeting is species-agnostic: any bird entering the protected zone triggers deterrence; no ignore list | Matches how the site is actually used by birds; simplifies perception to a generic "bird" class, which fits Path A's fixed-class on-sensor models | Adopted |
 | 2026-07-09 | Quiet hours (nightly + a weekend window): deterrent sound suppressed, water-only deterrence continues | Respect neighbours and rest windows while keeping the zone defended when birds are active | Adopted |

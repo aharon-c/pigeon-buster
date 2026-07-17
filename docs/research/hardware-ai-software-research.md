@@ -36,6 +36,8 @@ The job is real-time bird detection on a roof, on solar. That pushes us toward *
 ("edge") inference** (privacy, no cloud cost, works offline) and toward **low, predictable
 power**. Two credible single-board-computer paths:
 
+![Raspberry Pi 5 — the "brain" shared by both paths](../images/raspberry-pi-5.webp)
+
 ### Path A — Raspberry Pi 5 + Raspberry Pi AI Camera (Sony IMX500)  ← recommended start
 - The AI Camera runs the neural network **on the camera sensor itself** (IMX500 has an
   integrated accelerator + 8 MB on-sensor memory), doing real-time object detection while
@@ -44,6 +46,13 @@ power**. Two credible single-board-computer paths:
 - Best when we use a **fixed-class detector** (e.g., bird/pigeon) compiled for the sensor.
 - Trade-off: less flexible than a general NPU; running open-vocabulary YOLO-World on-sensor is
   not its sweet spot.
+
+![Raspberry Pi AI Camera (IMX500) — bare module with the Standard–Mini CSI cable](../images/ai-camera.jpg)
+
+*Note it ships as a **bare board-level module** (no housing — the enclosure's camera mount
+must hold the PCB itself) with a **"Standard – Mini" CSI flat-flex cable**, whose Mini end
+fits the Pi 5's smaller CAM/DISP connectors. Module close-up:
+[ai-camera-imx500-module.png](../images/ai-camera-imx500-module.png).*
 
 ### Path B — Raspberry Pi 5 + AI HAT+ (Hailo-8L 13 TOPS / Hailo-8 26 TOPS), or AI HAT+ 2 (Hailo-10H, 40 TOPS)
 - A Hailo NPU on an M.2/HAT gives flexible, higher-throughput vision inference (YOLO family,
